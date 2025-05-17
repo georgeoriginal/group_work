@@ -1,0 +1,73 @@
+#chat {
+    width: 80%; 
+    height: 72.5vh;
+    overflow: auto;
+    border-radius: 10px;
+
+    scrollbar-width: thin;
+
+    padding: 10px;
+    position: relative;
+    left: 15%;
+
+    background-color: rgb(164, 255, 255);
+
+}
+.SelfMessageGroup {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+.MessageGroup {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+}
+.Box{
+    background-color: #3f2400;
+    padding: 10px;
+    border-radius: 5px;
+    max-width: 100%;
+    color: white;
+}
+.SelfBox{
+    background-color: #fc7d07;
+    padding: 10px;
+    border-radius: 5px;
+    max-width: 100%;
+}
+.Name {
+    font-size: 14px;
+    margin: 10px;
+    left: 50%;
+    font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
+}
+#wrapper {
+    width: 80%;
+    height: 100vh;
+    background-color: rgb(164, 255, 255);
+    border: 1px solid #000000; 
+}
+
+.input{
+    width: 79%;
+    height: 5%;
+
+    position: fixed;
+
+    left: 15.4%;
+    bottom: 15px;
+    background-color: #3f2400;
+
+    padding: 10px;}
+input[type="text"] {
+    width: 90%;
+    height: 100%;
+    margin-left: 35px;
+}
+
+body {
+    background-color: #585858;
+    font-family: Arial, Helvetica, sans-serif;
+}

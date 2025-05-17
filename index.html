@@ -3,26 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Discord But Better</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <header>
-
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="services.html">Services</a></li>
-                <li><a href="contact.html">Contact</a></li>
-            </ul>
-        </nav>
-
-    </header>
-
-    <div>
-        
+    <div class="header">
+        <h1 style="margin-left: 50%;">Chat</h1>
     </div>
-    
+
+    <div class="wrapper">
+
+        <div id="chat">
+
+            <div class="MessageGroup">
+                <div class="message">
+                    <p class="Name"><strong>John Doe</strong></p>
+                    <div class="Box">
+                        <p> Hello, how are you?</p>
+                        <p>wanna go hang?</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="SelfMessageGroup">
+                <div class="message">
+                    <div class="SelfBox">
+                        <p>Hey! I'm good, how about you?</p>
+                        <p>Sure, where do you want to go?</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="MessageGroup">
+                <div class="message">
+                    <p class="Name"><strong>Jane Smith</strong></p>
+                    <div class="Box">
+                        <p>Hey! I'm good, how about you?</p>
+                        <p>Sure, where do you want to go?</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="MessageGroup">
+                <div class="message">
+                    <p class="Name"><strong>John Doe</strong></p>
+                    <div class="Box">
+                        <p>Sweet, Lets go to the Restoraunt Down the street</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="input">
+            <input  id="inputText" type="text" placeholder="Type a message..."  />
+            <button>Send</button>
+        </div>
+
+    </div>
 </body>
 </html>
