@@ -1,14 +1,37 @@
-#chat {
+.wrapper {
     width: 80%;
-    height: 72.5vh;
+    max-width: 80%;
+    height: 100vh;
+    margin: 0 auto;
+    color: #f0f0f0;
+
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    top: 5vh;
+    left: 5%;
+}
+
+body {
+    margin: 0;
+    background-color: #121212;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #f0f0f0;
+}
+
+#chat {
+    width: 100%;
+    height: 80vh;
     overflow: auto;
     padding: 10px;
-    position: relative;
-    left: 15%;
-    background-color: rgb(164, 255, 255);
+    background-color: #2a2a2a;
     border-top-right-radius: 10px;
     border-top-left-radius: 10px;
     scrollbar-width: thin;
+    border-left: 1px solid #444;
+    border-right: 1px solid #444;
+    border-top: 1px solid #444;
+    border-bottom: 1px solid #444;
 }
 
 .SelfMessageGroup {
@@ -23,19 +46,28 @@
     margin-bottom: 10px;
 }
 
-.Box {
-    background-color: #3f2400;
+.MessageBubble {
+    background-color: #3a86ff;
     padding: 10px;
-    border-radius: 5px;
-    max-width: 100%;
-    color: white;
+    border-radius: 25px;
+    max-width: 110%;
+    width: 110%;
+    color: #ffffff;
+    margin: 2px;
+    text-align: left;
 }
 
-.SelfBox {
-    background-color: #fc7d07;
+.SelfBubble {
+    background-color: #06d6a0;
     padding: 10px;
-    border-radius: 5px;
-    max-width: 100%;
+    border-radius: 25px;
+    max-width: 110%;
+    width: 110%;
+    color: #ffffff;
+    margin: 2px;
+    text-align: right;
+    position: relative;
+    right: 20%;
 }
 
 .Name {
@@ -43,32 +75,51 @@
     margin: 10px;
     font-weight: bold;
     font-family: Arial, Helvetica, sans-serif;
-}
-
-#wrapper {
-    height: 100vh;
-    background-color: rgb(164, 255, 255);
-    border: 1px solid #000;
+    color: #bbbbbb;
 }
 
 .input {
-    width: 80%;
+    width: 100%;
     height: 5%;
-    position: relative;
-    left: 15.4%;
-    background-color: #3f2400;
+    background-color: #2a2a2a;
     padding: 10px;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
+    margin: 0 auto;
+    border-left: 1px solid #444;
+    border-right: 1px solid #444;
+    border-bottom: 1px solid #444;
 }
 
-input[type="text"] {
+#inputText {
     width: 90%;
     height: 100%;
     margin-left: 35px;
+    font-family: Arial, Helvetica, sans-serif;
+    border: none;
+    border-radius: 10px;
+    background-color: #1e1e1e;
+    color: #f0f0f0;
+    padding: 5px;
+    position: relative;
+    bottom: 10%;
 }
 
-body {
-    background-color: #585858;
-    font-family: Arial, Helvetica, sans-serif;
+#inputText:focus {
+    outline: none;
+}
+
+.SendButton {
+    background-color: #3a86ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    position: relative;
+    bottom: 10%;
+}
+
+button:hover {
+    background-color: #265dbe;
 }
