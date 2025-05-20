@@ -18,11 +18,8 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     color: #f0f0f0;
     height: 100vh;
-    
+    overflow: hidden;
 }
-
-
-
 
 #chat {
     width: 100%;
@@ -32,7 +29,7 @@ body {
     background-color: #2a2a2a;
     border-top-right-radius: 10px;
     border-top-left-radius: 10px;
-    scrollbar-width: thin;
+    scrollbar-width: none;
     border-left: 1px solid #444;
     border-right: 1px solid #444;
     border-top: 1px solid #444;
@@ -132,7 +129,7 @@ button:hover {
 .servers{
     height: 100%;
     position: absolute;
-    width: 3%;
+    width: 5%;
     top: 50px;
     left: 0;
     background-color: #1e1c1c;
@@ -140,18 +137,17 @@ button:hover {
     border-left: #2a2a2a;
     border-top: #2a2a2a;
     border-right: #2a2a2a;
+    overflow-y: auto;
+    scrollbar-width: none;
 }
 
 .scroller{
-    height: 100%;
+    height: 80%;
     width: 8.8%;
     top: 50px;
     position: absolute;
     left: 56px;
-    background-color: #080808;
-    border-top: grey 1px solid; 
-    overflow-y: scroll;
-    border-left: grey 1px solid;
+    overflow-y: auto;
     border-top-left-radius: 10px;
     
     
@@ -168,6 +164,7 @@ button:hover {
     width: 50px;
     height: 50px;
     margin-top: 5px;
+    margin-left: 12%;
     
 }
 
