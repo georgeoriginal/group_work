@@ -112,7 +112,7 @@ body {
     outline: none;
 }
 
-.SendButton {
+#SendButton {
     background-color: #3a86ff;
     color: white;
     border: none;
