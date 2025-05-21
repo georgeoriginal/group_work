@@ -5,7 +5,6 @@ from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
 
-# Serve frontend
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
@@ -13,8 +12,6 @@ templates = Jinja2Templates(directory="templates")
 async def get_home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-
-# Client manager
 class ConnectionManager:
     def __init__(self):
         self.active_connections: list[tuple[WebSocket, str]] = []
@@ -38,7 +35,6 @@ class ConnectionManager:
         for conn, client_ip in self.active_connections:
             await conn.send_text(f"{sender_ip}: {message}")
             print(f"[<] Delivered to {client_ip}")
-
 
 manager = ConnectionManager()
 
