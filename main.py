@@ -180,7 +180,12 @@ async def websocket_endpoint(websocket: WebSocket):
                     await manager.send_to(websocket, {
                         "sender": sender,
                         "type": "error",
-                        "message": "You're not in a chat."
+                        "message": "Join a chat first You Dummy Just Join a Chat."
+                    })
+                    await manager.send_to(websocket, {
+                        "sender": sender,
+                        "type": "error",
+                        "message": "lorem ipsum dolor sit amet, consectetur adipiscing elit. lorem ipsum dolor sit amet, consectetur adipiscing elit. lorem ipsum dolor sit amet, consectetur adipiscing elit. lorem ipsum dolor sit amet, consectetur adipiscing elit.quick brown fox jumped over the lazy dog"
                     })
 
             # Handle starting a new chat.
