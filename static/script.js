@@ -1,95 +1,128 @@
-// Get references to important HTML elements
-const input = document.getElementById("inputText");           // Input field for the user's message
-const sendBtn = document.getElementById("SendButton");        // Send button
-const chatBox = document.getElementById("chat");              // Container for the chat messages
-const newChatBtn = document.getElementById("NewChat");        // Button to start a new chat
+// Get references to important HTML elements by their IDs
+const input = document.getElementById("inputText");        // The text input field for typing messages
+const sendBtn = document.getElementById("SendButton");     // The button to send a message
+const chatBox = document.getElementById("chat");           // The container where messages are displayed
+const newChatBtn = document.getElementById("NewChat");     // The button to start a new chat session
 
-// Assign the NewChat function to the new chat button
+// Set the function to be called when the "New Chat" button is clicked
 newChatBtn.onclick = startNewChat;
 
-let socket;                              // WebSocket object for server communication
-let userName = prompt("Enter your name:"); // Ask the user for their name on page load
+// Declare variables to be used later
+let socket;              // Will hold the WebSocket connection
+let lastSpeaker = null;  // Tracks who last sent a message (used for grouping bubbles)
+let lastMessageGroup = null;  // Tracks the current message group container
 
-let lastSpeaker = null;                  // Track the last person who sent a message
-let lastMessageGroup = null;             // Track the last message group DOM element
+// Prompt the user to enter a name when they load the page
+let userName = prompt("Enter your name:").trim();  // Prompt returns a string; trim() removes whitespace
 
-// Open a WebSocket connection
-socket = new WebSocket("wss://https://group-work-nz0g.onrender.com/ws");
+// Open the WebSocket connection to your FastAPI server (wss = secure WebSocket)
+socket = new WebSocket("wss://group-work-nz0g.onrender.com/ws");
 
-// When the WebSocket connection is established
+// WebSocket event: when the connection is established
 socket.addEventListener("open", () => {
     console.log("[WebSocket] Connected");
-    socket.send(":/" + userName); // Send the user’s name to the server, prefixed by ":/"
+    // Send registration info to the server with the user's name
+    socket.send(JSON.stringify({
+        type: "register",     // Message type is 'register'
+        name: userName        // The user's chosen name
+    }));
 });
 
-// Handle incoming WebSocket messages
+// WebSocket event: when a message is received from the server
 socket.addEventListener("message", (event) => {
-    const [sender, ...messageParts] = event.data.split(": ");
-    const message = messageParts.join(": ");
+    // Parse the incoming data as JSON
+    const data = JSON.parse(event.data);
+
+    // Extract sender and message content
+    const sender = data.name;
+    const message = data.message;
 
     console.log("Sender:", sender);
     console.log("Message:", message);
 
-    // New speaker detected
+    // Check if the message is from a different speaker than last time
     if (!lastSpeaker || lastSpeaker !== sender) {
+        // New speaker, update tracker
         lastSpeaker = sender;
 
-        // Create a new message group
+        // Create a new group for this speaker's messages
         lastMessageGroup = document.createElement("div");
         lastMessageGroup.className = sender === userName ? "SelfMessageGroup" : "MessageGroup";
 
+        // Create a container for the message bubble
         const messageWrapper = document.createElement("div");
         messageWrapper.className = "message";
         lastMessageGroup.appendChild(messageWrapper);
 
+        // Append the entire group to the chat box
         chatBox.appendChild(lastMessageGroup);
 
+        // Add the sender's name to the top of the message
         const nameTag = document.createElement("p");
         nameTag.className = "Name";
         nameTag.innerHTML = `<strong>${sender}</strong>`;
         messageWrapper.appendChild(nameTag);
 
+        // Add the message bubble itself
         const bubble = document.createElement("p");
         bubble.className = sender === userName ? "SelfBubble" : "MessageBubble";
         bubble.innerHTML = message;
         messageWrapper.appendChild(bubble);
-    }
-    // Same speaker as previous message
-    else {
+    } else {
+        // Same speaker as before → append message to existing group
         const bubble = document.createElement("p");
         bubble.className = sender === userName ? "SelfBubble" : "MessageBubble";
         bubble.innerHTML = message;
-
-        lastMessageGroup.firstChild.appendChild(bubble);
+        lastMessageGroup.firstChild.appendChild(bubble); // Add to the last group’s wrapper
     }
 });
 
-// Handle WebSocket disconnection
+// WebSocket event: when the connection is closed
 socket.addEventListener("close", () => {
     console.log("[WebSocket] Disconnected");
 });
 
-// Send message when button is clicked or Enter is pressed
+// Bind the click event to the send button
 sendBtn.onclick = sendMessage;
-input.onkeydown = (e) => {
-    if (e.key === "Enter") sendMessage();
-};
 
-// Function to start a new chat (clears all messages)
-function startNewChat() {
-    const chatName = prompt("Enter the name of the new chat:");
-    while (chatBox.firstChild) {
-        chatBox.removeChild(chatBox.lastChild);
-    }
-}
+// Bind the Enter key to also send a message
+input.onkeydown = (e) => {
+    if (e.key === "Enter") sendMessage();  // Only act when Enter is pressed
+};
 
 // Function to send a message through the WebSocket
 function sendMessage() {
-    const message = input.value.trim();
+    const message = input.value.trim(); // Get and clean message text
     if (message !== "" && socket.readyState === WebSocket.OPEN) {
-        socket.send(message);
-        input.value = "";
+        // Only send if the socket is open and message is not empty
+        socket.send(JSON.stringify({
+            type: "message",   // Tell server this is a chat message
+            message: message   // Send the actual message
+        }));
+        input.value = ""; // Clear the input box
     } else if (socket.readyState !== WebSocket.OPEN) {
         console.warn("WebSocket is not open. Message not sent.");
     }
+}
+
+// Function to start a new chat session (clears UI, notifies server)
+function startNewChat() {
+    const chatName = prompt("Enter the name of the new chat:");  // Ask user who they want to chat with
+
+    // Send a request to start a chat with the given name
+    if (chatName && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({
+            type: "new_chat",  // Inform server we're starting a chat
+            target: chatName   // The name of the user we want to chat with
+        }));
+    }
+
+    // Clear all current messages in the chat box
+    while (chatBox.firstChild) {
+        chatBox.removeChild(chatBox.lastChild); // Remove each child element from chat
+    }
+
+    // Reset message grouping
+    lastSpeaker = null;
+    lastMessageGroup = null;
 }

@@ -2,98 +2,151 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+import json
 
-# FastAPI is a Python framework used to build websites and APIs quickly.
-# It lets you handle web pages, APIs, and real-time connections like WebSockets easily.
-
-# A WebSocket is a way for the server and the browser to keep a connection open,
-# so they can send messages back and forth instantly without reloading the page.
-# This makes real-time features like chat apps possible.
-
-# Create an instance of the FastAPI app
 app = FastAPI()
 
-# Mount the 'static' directory to serve static files like CSS, JS, images
 app.mount("/static", StaticFiles(directory="static"), name="static")
-
-# Set up Jinja2Templates to render HTML templates from the 'templates' directory
 templates = Jinja2Templates(directory="templates")
 
-# Dictionary to store name-to-IP mappings (e.g., {"Alice": "127.0.0.1"})
-Names = {}
+# Data structures
+active_chats = {}   # {"Alice": "Bob", "Bob": "Alice"}
+name_to_ip = {}     # {"Alice": "1.2.3.4"}
 
-# Route for the homepage that serves the index.html file
-@app.get("/", response_class=HTMLResponse)
-async def get_home(request: Request):
-    # Render the 'index.html' template and pass the request object to it
-    return templates.TemplateResponse("index.html", {"request": request})
-
-# Class to manage WebSocket client connections
+# Connection Manager
 class ConnectionManager:
     def __init__(self):
-        # List of currently connected clients in the format: (WebSocket, client_ip)
-        self.active_connections: list[tuple[WebSocket, str]] = []
+        self.active_connections: list[tuple[WebSocket, str, str]] = []  # (WebSocket, IP, Name)
 
     async def connect(self, websocket: WebSocket):
-        # Accept the WebSocket connection
         await websocket.accept()
-        # Get the IP address of the client
-        client_ip = websocket.client.host
-        # Store the connection and IP
-        self.active_connections.append((websocket, client_ip))
-        print(f"[+] {client_ip} connected.")
+        ip = websocket.client.host
+        self.active_connections.append((websocket, ip, None))
+        print(f"[+] {ip} connected.")
 
     def disconnect(self, websocket: WebSocket):
-        # Remove the connection from the list when a client disconnects
         for conn in self.active_connections:
             if conn[0] == websocket:
                 self.active_connections.remove(conn)
                 print(f"[-] {conn[1]} disconnected.")
                 break
 
-    async def broadcast(self, message: str, sender: WebSocket):
-        # Broadcast a message to all connected clients
-        sender_ip = sender.client.host  # Identify the sender IP
-        print(f"[>] {sender_ip} sent: {message}")
-        for conn, client_ip in self.active_connections:
-            # Send the message to each client
-            await conn.send_text(f"{sender_ip}: {message}")
-            print(f"[<] Delivered to {client_ip}")
+    async def set_name(self, websocket: WebSocket, name: str):
+        for i, (ws, ip, _) in enumerate(self.active_connections):
+            if ws == websocket:
+                self.active_connections[i] = (ws, ip, name)
+                name_to_ip[name] = ip
+                print(f"[+] Name registered: {name} => {ip}")
+                break
 
-# Instantiate the ConnectionManager
+    def get_socket_by_name(self, name: str):
+        for ws, _, n in self.active_connections:
+            if n == name:
+                return ws
+        return None
+
+    def get_ip_by_name(self, name: str):
+        return name_to_ip.get(name)
+
+    def get_name_by_socket(self, websocket: WebSocket):
+        for ws, _, name in self.active_connections:
+            if ws == websocket:
+                return name
+        return None
+
+    def get_ip_by_socket(self, websocket: WebSocket):
+        for ws, ip, _ in self.active_connections:
+            if ws == websocket:
+                return ip
+        return None
+
+    async def send_to(self, websocket: WebSocket, data: dict):
+        await websocket.send_text(json.dumps(data))
+
+    async def broadcast(self, payload: dict):
+        data = json.dumps(payload)
+        for conn, _, _ in self.active_connections:
+            await conn.send_text(data)
+
 manager = ConnectionManager()
 
-# Function that is called every time a message is received from a client
-def on_message_received(sender_ip: str, message: str):
-    # Log the incoming message along with the sender's IP
-    print(f"[Message Received] From {sender_ip}: {message}")
-    # Extend this function to write to a file or database if needed
+@app.get("/", response_class=HTMLResponse)
+async def get_home(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
-# WebSocket endpoint at '/ws' to handle WebSocket connections
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    await manager.connect(websocket)  # Accept WebSocket connection
-    client_ip = websocket.client.host
-
+    await manager.connect(websocket)
     try:
-        # First message from the client must be the name
-        name = await websocket.receive_text()
-        name = name.strip()
-
-        # Store the name with the client's IP
-        Names[name] = client_ip
-        print(f"[+] Name registered: {name} => {client_ip}")
-
-        # Start listening for chat messages
         while True:
-            data = await websocket.receive_text()  # Wait for message from this client
-            on_message_received(name, data)  # Call the message received hook
+            text_data = await websocket.receive_text()
+            data = json.loads(text_data)
 
-            # Format the message as "Name: message" 
-            formatted_message = f"{name}: {data}"
+            if data["type"] == "register":
+                await manager.set_name(websocket, data["name"])
 
-            # Broadcast it to all clients including the sender
-            await manager.broadcast(formatted_message, sender=websocket)
+            elif data["type"] == "message":
+                sender = manager.get_name_by_socket(websocket)
+                msg = data["message"]
+                recipient = active_chats.get(sender)
+
+                if recipient:
+                    # Get both sockets
+                    sender_socket = websocket
+                    recipient_socket = manager.get_socket_by_name(recipient)
+
+                    # Format the message
+                    payload = {
+                        "type": "message",
+                        "sender": sender,
+                        "message": msg
+                    }
+
+                    # Send to both chat participants
+                    await manager.send_to(sender_socket, payload)
+                    await manager.send_to(recipient_socket, payload)
+
+                    print(f"[DM] {sender} → {recipient}: {msg}")
+
+                else:
+                    await manager.send_to(websocket, {
+                        "type": "error",
+                        "message": "You're not in a chat."
+                    })
+
+            elif data["type"] == "new_chat":
+                initiator = manager.get_name_by_socket(websocket)
+                target = data["target"]
+                target_socket = manager.get_socket_by_name(target)
+
+                if target_socket:
+                    # Register the chat
+                    active_chats[initiator] = target
+                    active_chats[target] = initiator
+
+                    # Get IPs
+                    ip_initiator = manager.get_ip_by_socket(websocket)
+                    ip_target = manager.get_ip_by_socket(target_socket)
+
+                    print(f"[Chat Start] {initiator} ({ip_initiator}) <-> {target} ({ip_target})")
+
+                    # Notify both users
+                    await manager.send_to(websocket, {
+                        "type": "start_chat",
+                        "with": target,
+                        "ip": ip_target
+                    })
+                    await manager.send_to(target_socket, {
+                        "type": "start_chat",
+                        "with": initiator,
+                        "ip": ip_initiator
+                    })
+
+                else:
+                    await manager.send_to(websocket, {
+                        "type": "error",
+                        "message": f"User '{target}' is not online."
+                    })
 
     except WebSocketDisconnect:
-        manager.disconnect(websocket)  # Remove disconnected client
+        manager.disconnect(websocket)
