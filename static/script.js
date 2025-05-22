@@ -47,6 +47,8 @@ socket.addEventListener("message", (event) => {
 
         // Create a new group for this speaker's messages
         lastMessageGroup = document.createElement("div");
+        console.log("sender", sender);
+        console.log("userName", userName);
         lastMessageGroup.className = sender === userName ? "SelfMessageGroup" : "MessageGroup";
 
         // Create a container for the message bubble
