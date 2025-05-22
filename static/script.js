@@ -31,16 +31,11 @@ socket.addEventListener("open", () => {
 // WebSocket event: when a message is received from the server
 socket.addEventListener("message", (event) => {
     // Parse the incoming data as JSON
-    console.log("Received event:", event);
-    console.log("Received data:", event.data);
     const data = JSON.parse(event.data);
 
     // Extract sender and message content
     const sender = data.sender;
     const message = data.message;
-
-    console.log("Sender:", sender);
-    console.log("Message:", message);
 
     // Check if the message is from a different speaker than last time
     if (!lastSpeaker || lastSpeaker !== sender) {
@@ -79,6 +74,7 @@ socket.addEventListener("message", (event) => {
         bubble.innerHTML = message;
         lastMessageGroup.firstChild.appendChild(bubble); // Add to the last group’s wrapper
     }
+    chatBox.scrollTop = chatBox.scrollHeight;
 });
 
 // WebSocket event: when the connection is closed
