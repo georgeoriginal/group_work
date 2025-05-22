@@ -83,6 +83,7 @@ async def websocket_endpoint(websocket: WebSocket):
             data = json.loads(text_data)
 
             if data["type"] == "register":
+                print(f"[+] Registering {data['name']}")
                 await manager.set_name(websocket, data["name"])
 
             elif data["type"] == "message":
