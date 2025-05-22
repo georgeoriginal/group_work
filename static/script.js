@@ -14,7 +14,7 @@ let lastSpeaker = null;                  // Track the last person who sent a mes
 let lastMessageGroup = null;             // Track the last message group DOM element
 
 // Open a WebSocket connection
-socket = new WebSocket("wss://8a7d-2a0b-6204-f2c4-ec00-f926-6173-8d7e-8ff.ngrok-free.app/ws");
+socket = new WebSocket("wss://https://group-work-nz0g.onrender.com/ws");
 
 // When the WebSocket connection is established
 socket.addEventListener("open", () => {
