@@ -110,6 +110,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
                 else:
                     await manager.send_to(websocket, {
+                        "sender": "<strong>ERROR</strong>",
                         "type": "error",
                         "message": "You're not in a chat."
                     })

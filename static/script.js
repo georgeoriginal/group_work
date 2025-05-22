@@ -36,7 +36,7 @@ socket.addEventListener("message", (event) => {
     const data = JSON.parse(event.data);
 
     // Extract sender and message content
-    const sender = data.name;
+    const sender = data.sender;
     const message = data.message;
 
     console.log("Sender:", sender);
