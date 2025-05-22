@@ -48,6 +48,14 @@ socket.addEventListener("message", (event) => {
         // New speaker, update tracker
         lastSpeaker = sender; // Update the `lastSpeaker` variable to the current sender.
 
+        if (sender == undefined) {
+            console.log("sender is undefined"); // Logs a message to the console if the sender is undefined.
+            return; // Exits the function early if the sender is undefined.
+        }
+        if (message == undefined) {
+            console.log("message is undefined"); // Logs a message to the console if the message is undefined.
+            return; // Exits the function early if the message is undefined.
+        }
         // Create a new group for this speaker's messages
         lastMessageGroup = document.createElement("div"); // Creates a new `div` element to group this speaker's messages.
         console.log("sender", sender); // Logs the sender's name to the console (for debugging purposes).
