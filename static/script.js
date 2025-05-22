@@ -16,7 +16,7 @@ let lastMessageGroup = null;  // Tracks the current message group container
 let userName = prompt("Enter your name:").trim();  // Prompt returns a string; trim() removes whitespace
 
 // Open the WebSocket connection to your FastAPI server (wss = secure WebSocket)
-socket = new WebSocket("wss://group-work-kixr.onrender.com");
+socket = new WebSocket("wss://group-work-kixr.onrender.com/ws");
 
 // WebSocket event: when the connection is established
 socket.addEventListener("open", () => {
