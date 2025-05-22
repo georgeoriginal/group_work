@@ -39,16 +39,19 @@ body {
 }
 
 .SelfMessageGroup {
+    padding-top: 5px;
     display: flex;
     justify-content: flex-end;
     margin-bottom: 10px;
+    padding-right: 5px;
 }
 
 .MessageGroup {
-    padding-top: 25px;
+    padding-top: 5px;
     display: flex;
     justify-content: flex-start;
     margin-bottom: 10px;
+    padding-left: 5px;
 }
 
 .MessageBubble {

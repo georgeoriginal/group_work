@@ -115,6 +115,11 @@ async def websocket_endpoint(websocket: WebSocket):
                         "type": "error",
                         "message": "You're not in a chat."
                     })
+                    await manager.send_to(websocket, {
+                        "sender": sender,
+                        "type": "error",
+                        "message": "You're not in a chat."
+                    })
 
             elif data["type"] == "new_chat":
                 initiator = manager.get_name_by_socket(websocket)
