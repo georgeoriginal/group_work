@@ -220,6 +220,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     # If the target user is not online, send an error message.
                     await manager.send_to(websocket, {
                         "type": "error",
+                        "sender": "<strong>ERROR</strong>",
                         "message": f"User '{target}' is not online."
                     })
 

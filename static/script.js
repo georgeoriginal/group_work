@@ -56,6 +56,7 @@ socket.addEventListener("message", (event) => {
             console.log("message is undefined"); // Logs a message to the console if the message is undefined.
             return; // Exits the function early if the message is undefined.
         }
+        
         // Create a new group for this speaker's messages
         lastMessageGroup = document.createElement("div"); // Creates a new `div` element to group this speaker's messages.
         console.log("sender", sender); // Logs the sender's name to the console (for debugging purposes).

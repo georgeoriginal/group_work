@@ -73,8 +73,9 @@ body {
     background-color: #3a86ff;
     padding: 10px;
     border-radius: 25px;
-    max-width: 110%;
-    width: 110%;
+    max-width: 70%;
+    word-wrap: break-word; 
+    word-break: break-word;
     color: #ffffff;
     margin: 2px;
     text-align: left;
@@ -85,14 +86,15 @@ body {
     background-color: #06d6a0;
     padding: 10px;
     border-radius: 25px;
-    max-width: 110%;
-    width: 110%;
+    max-width: 70%; 
+    word-wrap: break-word;
+    word-break: break-word;
     color: #ffffff;
     margin: 2px;
     text-align: right;
     position: relative;
     right: 20%;
-    animation: popUp 0.3s ease-out; 
+    animation: popUp 0.3s ease-out;
 }
 .Name {
     font-size: 14px;
