@@ -54,6 +54,21 @@ body {
     padding-left: 5px;
 }
 
+/* Add animation for SelfBubble and MessageBubble popping up */
+@keyframes popUp {
+    0% {
+        transform: scale(0.5); /* Start smaller */
+        opacity: 0;           /* Start invisible */
+    }
+    50% {
+        transform: scale(1.1); /* Slightly larger for a "pop" effect */
+        opacity: 1;            /* Fully visible */
+    }
+    100% {
+        transform: scale(1);   /* Settle to normal size */
+    }
+}
+
 .MessageBubble {
     background-color: #3a86ff;
     padding: 10px;
@@ -63,6 +78,7 @@ body {
     color: #ffffff;
     margin: 2px;
     text-align: left;
+    animation: popUp 0.3s ease-out;
 }
 
 .SelfBubble {
@@ -76,8 +92,8 @@ body {
     text-align: right;
     position: relative;
     right: 20%;
+    animation: popUp 0.3s ease-out; 
 }
-
 .Name {
     font-size: 14px;
     margin: 10px;
