@@ -37,23 +37,6 @@ body {
 
     margin-top: 25px;
 }
-
-.SelfMessageGroup {
-    padding-top: 5px;
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 10px;
-    padding-right: 5px;
-}
-
-.MessageGroup {
-    padding-top: 5px;
-    display: flex;
-    justify-content: flex-start;
-    margin-bottom: 10px;
-    padding-left: 5px;
-}
-
 /* Add animation for SelfBubble and MessageBubble popping up */
 @keyframes popUp {
     0% {
@@ -69,13 +52,33 @@ body {
     }
 }
 
+.MessageGroup {
+    padding-top: 5px;
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+    padding-left: 5px;
+    flex-wrap: wrap; /* Allows the group to wrap if the content gets too long */
+    max-width: 100%; /* Ensures the group doesn't exceed the container width */
+}
+
+.SelfMessageGroup {
+    padding-top: 5px;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+    padding-right: 5px;
+    flex-wrap: wrap; /* Allows the group to wrap if the content gets too long */
+    max-width: 100%; /* Ensures the group doesn't exceed the container width */
+}
+
 .MessageBubble {
     background-color: #3a86ff;
     padding: 10px;
     border-radius: 25px;
-    max-width: 110%;
-    word-wrap: break-word; 
-    word-break: break-word;
+    max-width: 70%; /* Limit the width of the bubble */
+    word-wrap: break-word; /* Break long words to fit within the bubble */
+    word-break: break-word; /* Ensure long words break properly */
     color: #ffffff;
     margin: 2px;
     text-align: left;
@@ -86,14 +89,14 @@ body {
     background-color: #06d6a0;
     padding: 10px;
     border-radius: 25px;
-    max-width: 110%; 
-    word-wrap: break-word;
-    word-break: break-word;
+    max-width: 70%; /* Limit the width of the bubble */
+    word-wrap: break-word; /* Break long words to fit within the bubble */
+    word-break: break-word; /* Ensure long words break properly */
     color: #ffffff;
     margin: 2px;
     text-align: right;
     position: relative;
-    right: 20%;
+    right: 0;
     animation: popUp 0.3s ease-out;
 }
 .Name {
