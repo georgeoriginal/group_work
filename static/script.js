@@ -1,100 +1,95 @@
-const input = document.getElementById("inputText");
-const sendBtn = document.getElementById("SendButton");
-const chatBox = document.getElementById("chat");
-const NewChatDivButton = document.getElementById("NewChat");
+// Get references to important HTML elements
+const input = document.getElementById("inputText");           // Input field for the user's message
+const sendBtn = document.getElementById("SendButton");        // Send button
+const chatBox = document.getElementById("chat");              // Container for the chat messages
+const newChatBtn = document.getElementById("NewChat");        // Button to start a new chat
 
+// Assign the NewChat function to the new chat button
+newChatBtn.onclick = startNewChat;
 
-NewChatDivButton.onclick = NewChat;
+let socket;                              // WebSocket object for server communication
+let userName = prompt("Enter your name:"); // Ask the user for their name on page load
 
-let socket;
-let userName = prompt("Enter your name:");
+let lastSpeaker = null;                  // Track the last person who sent a message
+let lastMessageGroup = null;             // Track the last message group DOM element
 
-let LastSpeaker = null;
-let LastMessageGroup = null;
+// Open a WebSocket connection
+socket = new WebSocket("wss://group-work-nz0g.onrender.com/ws");
 
-const MessageGroupLayout = '<div class="MessageGroup"><div class="message"><p class="Name"><strong>John Doe</strong></p></div></div>'
-
-fetch("/config.json?cachebust=" + Date.now())
-    .then(res => res.json())
-    .then(config => {
-        socket = new WebSocket(config.websocketURL);
-
-        socket.addEventListener("open", () => {
-            console.log("[WebSocket] Connected");
-            socket.send(":/" + userName); // Send the name
-        });
-
-        socket.addEventListener("message", (event) => {
-            const [sender, ...messageParts] = event.data.split(": ");
-            const message = messageParts.join(": ");
-            console.log("Sender:", sender);
-            console.log("Message:", message);
-            if (!LastSpeaker || LastSpeaker !== sender) {
-                LastSpeaker = sender;
-                LastMessageGroup = document.createElement("div");
-                LastMessageGroup.className = "MessageGroup";
-
-                let Message = document.createElement("div");
-                Message.className = "message";
-                LastMessageGroup:appendChild(Message);
-                
-                chatBox.appendChild(LastMessageGroup);
-
-                let Name = document.createElement("p");
-                Name.className = "Name";
-                Name.innerHTML = "<strong>" + sender + "</strong>";
-
-                let MessageBubble = document.createElement("p");
-                MessageBubble.className = "MessageBubble";
-                if (LastSpeaker == userName) {
-                    LastMessageGroup.className = "SelfMessageGroup";
-                    MessageBubble.className = "SelfBubble";
-                }
-                Message.appendChild(Name);
-                Message.appendChild(MessageBubble);
-                MessageBubble.innerHTML = message;
-            }
-            else if (LastSpeaker == sender) {
-                let MessageBubble = document.createElement("p");
-                MessageBubble.className = "MessageBubble";
-                if (LastSpeaker == userName) {
-                    LastMessageGroup.className = "SelfMessageGroup";
-                    MessageBubble.className = "SelfBubble";
-                }
-                LastMessageGroup.firstChild.appendChild(MessageBubble);
-                MessageBubble.innerHTML = message;
-            }
-        });
-
-        socket.addEventListener("close", () => {
-            console.log("[WebSocket] Disconnected");
-        });
-
-        sendBtn.onclick = sendMessage;
-        input.onkeydown = (e) => {
-            if (e.key === "Enter") sendMessage();
-        };
+// When the WebSocket connection is established
+socket.addEventListener("open", () => {
+    console.log("[WebSocket] Connected");
+    socket.send(":/" + userName); // Send the user’s name to the server, prefixed by ":/"
 });
 
-function NewChat() {
-    const NewChat = prompt("Enter the name of the new chat:");
+// Handle incoming WebSocket messages
+socket.addEventListener("message", (event) => {
+    const [sender, ...messageParts] = event.data.split(": ");
+    const message = messageParts.join(": ");
+
+    console.log("Sender:", sender);
+    console.log("Message:", message);
+
+    // New speaker detected
+    if (!lastSpeaker || lastSpeaker !== sender) {
+        lastSpeaker = sender;
+
+        // Create a new message group
+        lastMessageGroup = document.createElement("div");
+        lastMessageGroup.className = sender === userName ? "SelfMessageGroup" : "MessageGroup";
+
+        const messageWrapper = document.createElement("div");
+        messageWrapper.className = "message";
+        lastMessageGroup.appendChild(messageWrapper);
+
+        chatBox.appendChild(lastMessageGroup);
+
+        const nameTag = document.createElement("p");
+        nameTag.className = "Name";
+        nameTag.innerHTML = `<strong>${sender}</strong>`;
+        messageWrapper.appendChild(nameTag);
+
+        const bubble = document.createElement("p");
+        bubble.className = sender === userName ? "SelfBubble" : "MessageBubble";
+        bubble.innerHTML = message;
+        messageWrapper.appendChild(bubble);
+    }
+    // Same speaker as previous message
+    else {
+        const bubble = document.createElement("p");
+        bubble.className = sender === userName ? "SelfBubble" : "MessageBubble";
+        bubble.innerHTML = message;
+
+        lastMessageGroup.firstChild.appendChild(bubble);
+    }
+});
+
+// Handle WebSocket disconnection
+socket.addEventListener("close", () => {
+    console.log("[WebSocket] Disconnected");
+});
+
+// Send message when button is clicked or Enter is pressed
+sendBtn.onclick = sendMessage;
+input.onkeydown = (e) => {
+    if (e.key === "Enter") sendMessage();
+};
+
+// Function to start a new chat (clears all messages)
+function startNewChat() {
+    const chatName = prompt("Enter the name of the new chat:");
     while (chatBox.firstChild) {
         chatBox.removeChild(chatBox.lastChild);
-      }
-    // socket.send("New Chat");
-}
-
-function sendMessage() {
-    const message = input.value.trim();
-    if (message !== "") {
-        socket.send(message);
-        input.value = "";
     }
 }
 
-function handleKeyPress(event) {
-    if (event.key === "Enter") {
-        event.preventDefault();     
-        sendMessage();
+// Function to send a message through the WebSocket
+function sendMessage() {
+    const message = input.value.trim();
+    if (message !== "" && socket.readyState === WebSocket.OPEN) {
+        socket.send(message);
+        input.value = "";
+    } else if (socket.readyState !== WebSocket.OPEN) {
+        console.warn("WebSocket is not open. Message not sent.");
     }
 }
