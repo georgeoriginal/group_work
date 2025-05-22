@@ -31,6 +31,8 @@ socket.addEventListener("open", () => {
 // WebSocket event: when a message is received from the server
 socket.addEventListener("message", (event) => {
     // Parse the incoming data as JSON
+    console.log("Received event:", event);
+    console.log("Received data:", event.data);
     const data = JSON.parse(event.data);
 
     // Extract sender and message content
