@@ -113,6 +113,7 @@ class ConnectionManager:
         # Send the data to all active WebSocket connections.
         for conn, _, _ in self.active_connections:
             await conn.send_text(data)
+    
 
 # Creating an instance of the ConnectionManager class to manage WebSocket connections.
 manager = ConnectionManager()
